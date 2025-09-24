@@ -46,12 +46,21 @@ const __dirname = path.dirname(__filename);
 // );
  
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true, // if you need cookies/auth headers
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    const allowedOrigins = process.env.CORS_ORIGIN?.split(",") || [];
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
