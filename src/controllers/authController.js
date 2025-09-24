@@ -90,8 +90,9 @@ const verifyApi = async (req, res) => {
       const oldEnc = `ENC=${encrypt(
         `CLIENT_ID=1&USER_ID=2&MOBILE_NO=${cookieMobile}`
       )}`;
+      console.log("Deleting old Redis key...");
       await redisClient.del(`user:${oldEnc}:rt:${oldHashed}`);
-
+      console.log("Deleted.");
       res.clearCookie("OHA-REF-T", {
         httpOnly: false,
         secure: true,
@@ -159,6 +160,7 @@ const verifyApi = async (req, res) => {
         }
       );
     });
+    console.log("Setting new Redis hash...");
 
     await setHash(
       `${encKey}:rt:${hashedRefreshToken}`,
@@ -167,6 +169,7 @@ const verifyApi = async (req, res) => {
       REFRESH_MAX_AGE_SEC
     );
 
+    console.log("Hash set.");
     res.cookie("OHA-REF-T", refreshToken, {
       httpOnly: false,
       secure: true,
